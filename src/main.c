@@ -116,25 +116,11 @@ main(int argc, char** argv)
     fplog = fopen("exe.log", "wt");
 #endif
 
-    /* 辞書をカレントディレクトリと1つ上のディレクトリから捜す */
     if (!dict)
     {
-	pmigemo = migemo_open("./dict/" MIGEMODICT_NAME);
+	pmigemo = migemo_open(MIGEMODICT_DIR MIGEMODICT_NAME);
 	if (!word && !mode_quiet)
-	{
-	    fprintf(fplog, "migemo_open(\"%s\")=%p\n",
-		    "./dict/" MIGEMODICT_NAME, pmigemo);
-	}
-	if (!pmigemo || !migemo_is_enable(pmigemo))
-	{
-	    migemo_close(pmigemo); /* NULLをcloseしても問題はない */
-	    pmigemo = migemo_open("../dict/" MIGEMODICT_NAME);
-	    if (!word && !mode_quiet)
-	    {
-		fprintf(fplog, "migemo_open(\"%s\")=%p\n",
-			"../dict/" MIGEMODICT_NAME, pmigemo);
-	    }
-	}
+	    fprintf(fplog, "migemo_open(\"%s\")=%p\n", MIGEMODICT_DIR MIGEMODICT_NAME, pmigemo);
     }
     else
     {
