@@ -4,10 +4,10 @@
 # 
 # Written By:  MURAOKA Taro <koron.kaoriya@gmail.com>
 
-DICT 		= migemo-dict
-DICT_BASE	= base-dict
-SKKDIC_BASEURL 	= http://openlab.ring.gr.jp/skk/dic
-SKKDIC_FILE	= SKK-JISYO.L
+SKKDIC_BASEURL 	= https://skk-dev.github.io/dict
+SKKDIC_FILE	= $(addprefix SKK-JISYO.,ML L)
+DICT 		= $(subst SKK-JISYO,migemo-dict,$(SKKDIC_FILE))
+DICT_BASE	= $(addsuffix .base,$(SKKDIC_FILE))
 EUCJP_DIR	= euc-jp.d
 UTF8_DIR	= utf-8.d
 
@@ -15,11 +15,9 @@ UTF8_DIR	= utf-8.d
 # Dictionary
 #
 $(DICT): $(DICT_BASE)
-	$(FILTER_CP932) < $(DICT_BASE) > $@
+	$(FILTER_CP932) < $(subst migemo-dict,SKK-JISYO,$(addsuffix .base,$@)) > $@
 $(DICT_BASE): $(SKKDIC_FILE) ../tools/skk2migemo.pl ../tools/optimize-dict.pl
-	$(PERL) ../tools/skk2migemo.pl < $(SKKDIC_FILE) > dict.tmp
-	$(PERL) ../tools/optimize-dict.pl < dict.tmp > $@
-	-$(RM) dict.tmp
+	$(PERL) ../tools/skk2migemo.pl < $(basename $@) | $(PERL) ../tools/optimize-dict.pl > $@
 $(SKKDIC_FILE):
 	$(HTTP) $(SKKDIC_BASEURL)/$@.gz
 	$(GUNZIP) $@.gz
@@ -32,14 +30,15 @@ cp932:		$(DICT)
 ##############################################################################
 # Dictionary in euc-jp
 #
+EUC_FILES = $(addprefix $(EUCJP_DIR)/,$(DICT))
 euc-jp: 	cp932 euc-jp-files
-euc-jp-files: $(EUCJP_DIR) $(EUCJP_DIR)/migemo-dict \
+euc-jp-files: $(EUCJP_DIR) $(EUC_FILES) \
 	$(EUCJP_DIR)/zen2han.dat $(EUCJP_DIR)/han2zen.dat \
 	$(EUCJP_DIR)/hira2kata.dat $(EUCJP_DIR)/roma2hira.dat
 $(EUCJP_DIR):
 	$(MKDIR) $(EUCJP_DIR)
-$(EUCJP_DIR)/migemo-dict: migemo-dict
-	$(FILTER_EUCJP) < migemo-dict > $@
+$(EUC_FILES): $(DICT)
+	$(FILTER_EUCJP) < $(notdir $@) > $@
 $(EUCJP_DIR)/zen2han.dat: zen2han.dat
 	$(FILTER_EUCJP) < zen2han.dat > $@
 $(EUCJP_DIR)/han2zen.dat: han2zen.dat
@@ -52,14 +51,15 @@ $(EUCJP_DIR)/roma2hira.dat: roma2hira.dat
 ##############################################################################
 # Dictionary in utf-8
 #
+UTF8_FILES = $(addprefix $(UTF8_DIR)/,$(DICT))
 utf-8: 	cp932 utf-8-files
-utf-8-files: $(UTF8_DIR) $(UTF8_DIR)/migemo-dict \
+utf-8-files: $(UTF8_DIR) $(UTF8_FILES) \
 	$(UTF8_DIR)/zen2han.dat $(UTF8_DIR)/han2zen.dat \
 	$(UTF8_DIR)/hira2kata.dat $(UTF8_DIR)/roma2hira.dat
 $(UTF8_DIR):
 	$(MKDIR) $(UTF8_DIR)
-$(UTF8_DIR)/migemo-dict: migemo-dict
-	$(FILTER_UTF8) < migemo-dict > $@
+$(UTF8_FILES): $(DICT)
+	$(FILTER_UTF8) < $(notdir $@) > $@
 $(UTF8_DIR)/zen2han.dat: zen2han.dat
 	$(FILTER_UTF8) < zen2han.dat > $@
 $(UTF8_DIR)/han2zen.dat: han2zen.dat

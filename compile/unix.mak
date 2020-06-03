@@ -9,7 +9,7 @@
 libmigemo_SRC = $(SRC)
 libmigemo_OBJ = $(OBJ)
 
-DEFINES	=
+DEFINES	= -DMIGEMODICT_DIR='"$(dictdir)/utf-8/"'
 CFLAGS	= -O2 -Wall $(DEFINES) $(CFLAGS_MIGEMO)
 LDFLAGS = $(LDFLAGS_MIGEMO)
 LIBS	= 
@@ -46,20 +46,23 @@ install-mkdir:
 	$(MKDIR) $(dictdir)/utf-8
 
 install-dict:
-	$(INSTALL_DATA) dict/migemo-dict $(dictdir)/cp932
+	$(INSTALL_DATA) dict/migemo-dict.* $(dictdir)/cp932
+	ln -s $(dictdir)/cp932/migemo-dict.ML $(dictdir)/cp932/migemo-dict
 	$(INSTALL_DATA) dict/han2zen.dat $(dictdir)/cp932
 	$(INSTALL_DATA) dict/hira2kata.dat $(dictdir)/cp932
 	$(INSTALL_DATA) dict/roma2hira.dat $(dictdir)/cp932
 	$(INSTALL_DATA) dict/zen2han.dat $(dictdir)/cp932
 	if [ -d dict/euc-jp.d ]; then \
-	  $(INSTALL_DATA) dict/euc-jp.d/migemo-dict $(dictdir)/euc-jp; \
+	  $(INSTALL_DATA) dict/euc-jp.d/migemo-dict.* $(dictdir)/euc-jp; \
+	  ln -s $(dictdir)/euc-jp/migemo-dict.ML $(dictdir)/euc-jp/migemo-dict; \
 	  $(INSTALL_DATA) dict/euc-jp.d/han2zen.dat $(dictdir)/euc-jp; \
 	  $(INSTALL_DATA) dict/euc-jp.d/hira2kata.dat $(dictdir)/euc-jp; \
 	  $(INSTALL_DATA) dict/euc-jp.d/roma2hira.dat $(dictdir)/euc-jp; \
 	  $(INSTALL_DATA) dict/euc-jp.d/zen2han.dat $(dictdir)/euc-jp; \
 	fi
 	if [ -d dict/utf-8.d ]; then \
-	  $(INSTALL_DATA) dict/utf-8.d/migemo-dict $(dictdir)/utf-8; \
+	  $(INSTALL_DATA) dict/utf-8.d/migemo-dict.* $(dictdir)/utf-8; \
+	  ln -s $(dictdir)/utf-8/migemo-dict.ML $(dictdir)/utf-8/migemo-dict; \
 	  $(INSTALL_DATA) dict/utf-8.d/han2zen.dat $(dictdir)/utf-8; \
 	  $(INSTALL_DATA) dict/utf-8.d/hira2kata.dat $(dictdir)/utf-8; \
 	  $(INSTALL_DATA) dict/utf-8.d/roma2hira.dat $(dictdir)/utf-8; \

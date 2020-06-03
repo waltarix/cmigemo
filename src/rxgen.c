@@ -24,7 +24,7 @@
 
 #define RXGEN_OP_MAXLEN 8
 #define RXGEN_OP_OR "|"
-#define RXGEN_OP_NEST_IN "("
+#define RXGEN_OP_NEST_IN "(?:"
 #define RXGEN_OP_NEST_OUT ")"
 #define RXGEN_OP_SELECT_IN "["
 #define RXGEN_OP_SELECT_OUT "]"
