@@ -15,6 +15,7 @@
 #endif
 
 #define MIGEMO_VERSION "1.3"
+#define MIGEMODICT_NAME "migemo-dict"
 
 /* for migemo_load() */
 #define MIGEMO_DICTID_INVALID		0

@@ -200,7 +200,7 @@ migemo_load(migemo* obj, int dict_id, const char* dict_file)
  * NULLを指定した場合には、辞書を含めていかなるファイルも読み込まれない。
  * ファイルはオブジェクト作成後にもmigemo_load()関数を使用することで追加読み
  * 込みができる。
- * @param dict migemo-dict辞書のパス。NULLの時は辞書を読み込まない。
+ * @param dict migemo-dict辞書のパス。NULLの時はデフォルト辞書を読み込む。
  * @returns 作成されたMigemoオブジェクト
  */
     EXPORTS migemo* MIGEMO_CALLTYPE
@@ -224,6 +224,11 @@ migemo_open(const char* dict)
     {
 	migemo_close(obj);
 	return obj = NULL;
+    }
+
+    if (dict == NULL)
+    {
+	dict = MIGEMODICT_DIR MIGEMODICT_NAME;
     }
 
     /* デフォルトmigemo辞書が指定されていたらローマ字とカタカナ辞書も探す */

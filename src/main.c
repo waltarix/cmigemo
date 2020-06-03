@@ -14,7 +14,6 @@
 #include "migemo.h"
 
 #define MIGEMO_ABOUT "cmigemo - C/Migemo Library " MIGEMO_VERSION " Driver"
-#define MIGEMODICT_NAME "migemo-dict"
 #define MIGEMO_SUBDICT_MAX 8
 
 /*
@@ -64,6 +63,7 @@ OPTIONS:\n\
   -q --quiet		Show no message except results.\n\
   -v --vim		Use vim style regexp.\n\
   -e --emacs		Use emacs style regexp.\n\
+  -c --capture		Use capture group.\n\
   -n --nonewline	Don't use newline match.\n\
   -w --word <word>	Expand a <word> and soon exit.\n\
   -h --help		Show this message.\n\
@@ -77,6 +77,7 @@ main(int argc, char** argv)
 {
     int mode_vim = 0;
     int mode_emacs = 0;
+    int mode_capture = 0;
     int mode_nonewline = 0;
     int mode_quiet = 0;
     char* dict = NULL;
@@ -96,6 +97,8 @@ main(int argc, char** argv)
 	    mode_vim = 1;
 	else if (!strcmp("--emacs", *argv) || !strcmp("-e", *argv))
 	    mode_emacs = 1;
+	else if (!strcmp("--capture", *argv) || !strcmp("-c", *argv))
+	    mode_capture = 1;
 	else if (!strcmp("--nonewline", *argv) || !strcmp("-n", *argv))
 	    mode_nonewline = 1;
 	else if (argv[1] && (!strcmp("--dict", *argv) || !strcmp("-d", *argv)))
@@ -116,25 +119,11 @@ main(int argc, char** argv)
     fplog = fopen("exe.log", "wt");
 #endif
 
-    /* 辞書をカレントディレクトリと1つ上のディレクトリから捜す */
     if (!dict)
     {
-	pmigemo = migemo_open("./dict/" MIGEMODICT_NAME);
+	pmigemo = migemo_open(MIGEMODICT_DIR MIGEMODICT_NAME);
 	if (!word && !mode_quiet)
-	{
-	    fprintf(fplog, "migemo_open(\"%s\")=%p\n",
-		    "./dict/" MIGEMODICT_NAME, pmigemo);
-	}
-	if (!pmigemo || !migemo_is_enable(pmigemo))
-	{
-	    migemo_close(pmigemo); /* NULLをcloseしても問題はない */
-	    pmigemo = migemo_open("../dict/" MIGEMODICT_NAME);
-	    if (!word && !mode_quiet)
-	    {
-		fprintf(fplog, "migemo_open(\"%s\")=%p\n",
-			"../dict/" MIGEMODICT_NAME, pmigemo);
-	    }
-	}
+	    fprintf(fplog, "migemo_open(\"%s\")=%p\n", MIGEMODICT_DIR MIGEMODICT_NAME, pmigemo);
     }
     else
     {
@@ -179,6 +168,10 @@ main(int argc, char** argv)
 	    migemo_set_operator(pmigemo, MIGEMO_OPINDEX_NEST_OUT, "\\)");
 	    if (!mode_nonewline)
 		migemo_set_operator(pmigemo, MIGEMO_OPINDEX_NEWLINE, "\\s-*");
+	}
+	else if (mode_capture)
+	{
+	    migemo_set_operator(pmigemo, MIGEMO_OPINDEX_NEST_IN, "(");
 	}
 #ifndef _PROFILE
 	if (word)
